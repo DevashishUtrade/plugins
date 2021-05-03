@@ -48,7 +48,11 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
               final String url = request.getUrl().toString();
               if (!flutterWebViewClient.shouldOverrideUrlLoading(
                   FlutterWebView.this.webView, request)) {
-                webView.loadUrl(url);
+                    if (url.contains("://")) {
+                      webView.loadUrl(url);
+                    } else {
+                      webView.loadUrl("file:///android_asset/flutter_assets/" + url);
+                    }
               }
               return true;
             }
@@ -193,6 +197,9 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
       case "loadUrl":
         loadUrl(methodCall, result);
         break;
+      case "loadAssetFile":
+        loadAssetFile(methodCall, result);
+        break;
       case "updateSettings":
         updateSettings(methodCall, result);
         break;
@@ -255,6 +262,12 @@ public class FlutterWebView implements PlatformView, MethodCallHandler {
       headers = Collections.emptyMap();
     }
     webView.loadUrl(url, headers);
+    result.success(null);
+  }
+
+  private void loadAssetFile(MethodCall methodCall, Result result) {
+    String url = (String) methodCall.arguments;
+    webView.loadUrl("file:///android_asset/flutter_assets/" + url);
     result.success(null);
   }
 
