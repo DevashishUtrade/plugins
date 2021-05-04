@@ -205,7 +205,7 @@
 
 - (void)onLoadAssetFile:(FlutterMethodCall*)call result:(FlutterResult)result {
   NSString* url = [call arguments];
-  if (![self loadAssetFile:url]) {
+  if (![self loadAssetFile:[call arguments]]) {
     result([FlutterError errorWithCode:@"loadAssetFile_failed"
                                message:@"Failed parsing the URL"
                                details:[NSString stringWithFormat:@"URL was: '%@'", url]]);
@@ -462,7 +462,13 @@
   return true;
 }
 
-- (bool)loadAssetFile:(NSString*)url {
+- (bool)loadAssetFile:(NSDictionary<NSString*, id>*)request {
+  if (!request) {
+    return false;
+  }
+
+  NSString* url = request[@"url"];
+
   NSString* key = [_registrar lookupKeyForAsset:url];
   NSURL* nsUrl = [[NSBundle mainBundle] URLForResource:key withExtension:nil];
   if (!nsUrl) {
